@@ -8,8 +8,11 @@ from collect.models import Measurement, Sensor
 
 def get_plot(rnd=0, sensor=None):
     measurements = Measurement.objects.filter(value__gt=10)
+    plot_y_label = "Any"
     if sensor is not None:
         measurements = measurements.filter(sensor=sensor)
+        if sensor.plot_y_axis_label:
+            plot_y_label = sensor.plot_y_axis_label
     measurements = measurements.order_by("date")
     datax = []
     datay = []
@@ -24,7 +27,6 @@ def get_plot(rnd=0, sensor=None):
     fig, ax = plt.subplots()
     ax.plot(datax, datay)
 
-    ax.set(xlabel='time (s)', ylabel='Moist level',
-           title='Moist level evolution')
+    ax.set(xlabel='time (s)', ylabel=plot_y_label)
     fig.savefig(f_name)
     return f_name

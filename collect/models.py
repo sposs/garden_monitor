@@ -7,6 +7,7 @@ class Sensor(models.Model):
     rpi_port = models.IntegerField()
     rpi_type = models.CharField(max_length=100, choices=(("analog", "Analog"), ("digital", "Digital")),
                                 default="analog")
+    plot_y_axis_label = models.CharField(max_length=50, null=True, blank=True)
 
     def __unicode__(self):
         return u"%s" % self.name
