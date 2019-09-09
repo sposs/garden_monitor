@@ -17,7 +17,7 @@ def get_plot(rnd=0, sensor=None):
     f_name = os.path.join(tmp_dir, "test%s.png" % rnd)
     for idx, measure in enumerate(measurements):
         if idx % 20:
-            datax.append(measure.date.strftime("%Y-%m-%d %H:%M"))
+            datax.append(measure.date.strftime("%s"))
         else:
             datax.append(None)
         datay.append(measure.value)
