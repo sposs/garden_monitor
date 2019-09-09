@@ -4,11 +4,14 @@ from collect.models import Measurement, Sensor
 
 
 class MeasureAdmin(admin.ModelAdmin):
-    list_display = ("date", "value")
+    list_display = ("date", "sensor", "value")
+    list_filter = ("sensor", )
+    date_hierarchy = "date"
 
 
 class SensorAdmin(admin.ModelAdmin):
     list_display = ("name", "rpi_type", "rpi_port")
+    list_filter = ("rpi_type", )
 
 
 admin.site.register(Measurement, MeasureAdmin)
