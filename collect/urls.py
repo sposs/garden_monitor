@@ -5,6 +5,6 @@ from collect.views import list_of_measurements, do_measure, get_data
 
 urlpatterns = [
   url(r"^$", list_of_measurements, name="index"),
-  url(r"^measure$", do_measure, name="measure"),
+  url(r"^measure/(?P<sensor_id>\d*)$", do_measure, name="measure"),
   url(r"^get_data$", get_data, name="get_data"),
 ]

@@ -8,7 +8,10 @@
         <title>Measures</title>
     </head>
     <body>
-    <img src="{% url "collect:get_data" %}?rnd={{ rnd }}" alt="plot"/>
+    {% for sensor in sensors %}
+    <h1>{{ sensor.name }}</h1>
+    <img src="{% url "collect:get_data" %}?rnd={{ rnd }}&sensor_id={{ sensor.id }}" alt="plot"/>
+    {% endfor %}
 {#    <h1>Measurements</h1>#}
 {#    <div id="placeholder" style="width:600px;height:300px"></div>#}
 {#    <script src="{% static "js/jquery.js" %}"></script>#}
