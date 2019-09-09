@@ -24,7 +24,7 @@ def list_of_measurements(request):
 
 @never_cache
 def get_data(request):
-    f_name = get_plot(request.get("rnd", 0))
+    f_name = get_plot(request.GET.get("rnd", 0))
     with open(f_name, "rb") as data:
         res = HttpResponse(data.read(), content_type="image/png")
         return res
