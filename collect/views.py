@@ -23,6 +23,7 @@ def list_of_measurements(request):
     return render(request, "measures.html", {"rnd": random.random()})
 
 
+@never_cache
 def get_data(request):
     measurements = Measurement.objects.filter(value__gt=10).order_by("date")
     datax = []
