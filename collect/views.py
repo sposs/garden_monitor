@@ -18,12 +18,12 @@ except ImportError:
     logger.error("Not on the appropriate device")
 
 
-@never_cache
 def list_of_measurements(request):
     measurements = Measurement.objects.all().order_by("date")
     return render(request, "measures.html", {"measures": measurements})
 
 
+@never_cache
 def get_data(request):
     measurements = Measurement.objects.filter(value__gt=10).order_by("date")
     datax = []
