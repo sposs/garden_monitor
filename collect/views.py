@@ -42,7 +42,7 @@ def get_data(request):
            title='Moist level evolution')
     fig.savefig(os.path.join(tmp_dir, "test.png"))
     with open(os.path.join(tmp_dir, "test.png"), "rb") as data:
-        res = HttpResponse(data.readlines())
+        res = HttpResponse(data.read(), content_type="image/png")
         return res
 
 
