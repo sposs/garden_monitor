@@ -168,6 +168,15 @@ LOGGING = {
     }
 }
 
+EMAIL_HOST = 'mail.gmx.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_SUBJECT_PREFIX = '[garden_monitor]'
+
+EMAIL_RECIPIENT = ""
+
 
 SENSOR = 0
 

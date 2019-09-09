@@ -1,15 +1,14 @@
 # -*- coding: UTF-8 -*-
-import os
 import random
-import tempfile
 
-from collect.models import Measurement
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 from django.conf import settings
 from django.http import HttpResponse
-import matplotlib.pyplot as plt
 import logging
+
+from collect.utils import get_plot
+
 logger = logging.getLogger("garden_monitor.collect.views")
 try:
     from collect import grovepi
@@ -25,23 +24,7 @@ def list_of_measurements(request):
 
 @never_cache
 def get_data(request):
-    measurements = Measurement.objects.filter(value__gt=10).order_by("date")
-    datax = []
-    datay = []
-    tmp_dir = tempfile.mkdtemp()
-    f_name = os.path.join(tmp_dir, "test%s.png" % request.GET.get("rnd", 0))
-    for idx, measure in enumerate(measurements):
-        if idx % 20:
-            datax.append(measure.date.strftime("%s"))
-        else:
-            datax.append(None)
-        datay.append(measure.value)
-    fig, ax = plt.subplots()
-    ax.plot(datax, datay)
-
-    ax.set(xlabel='time (s)', ylabel='Moist level',
-           title='Moist level evolution')
-    fig.savefig(f_name)
+    f_name = get_plot(request.get("rnd", 0))
     with open(f_name, "rb") as data:
         res = HttpResponse(data.read(), content_type="image/png")
         return res
