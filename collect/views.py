@@ -29,6 +29,7 @@ def get_data(request):
     datax = []
     datay = []
     tmp_dir = tempfile.mkdtemp()
+    f_name = os.path.join(tmp_dir, "test%s.png" % request.GET.get("rnd", 0))
     for idx, measure in enumerate(measurements):
         if idx % 20:
             datax.append(measure.date.strftime("%s"))
@@ -40,8 +41,8 @@ def get_data(request):
 
     ax.set(xlabel='time (s)', ylabel='Moist level',
            title='Moist level evolution')
-    fig.savefig(os.path.join(tmp_dir, "test.png"))
-    with open(os.path.join(tmp_dir, "test.png"), "rb") as data:
+    fig.savefig(f_name)
+    with open(f_name, "rb") as data:
         res = HttpResponse(data.read(), content_type="image/png")
         return res
 
