@@ -8,7 +8,7 @@
         <title>Measures</title>
     </head>
     <body>
-    <img src="{% url "collect:get_data" %}" alt="plot"/>
+    <img src="{% url "collect:get_data" %}?rnd={{ rnd }}" alt="plot"/>
 {#    <h1>Measurements</h1>#}
 {#    <div id="placeholder" style="width:600px;height:300px"></div>#}
 {#    <script src="{% static "js/jquery.js" %}"></script>#}

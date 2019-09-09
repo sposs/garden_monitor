@@ -1,13 +1,13 @@
 # -*- coding: UTF-8 -*-
 import os
+import random
 import tempfile
 
 from collect.models import Measurement
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 from django.conf import settings
-from django.http import HttpResponse, JsonResponse
-import matplotlib
+from django.http import HttpResponse
 import matplotlib.pyplot as plt
 import logging
 logger = logging.getLogger("garden_monitor.collect.views")
@@ -18,12 +18,11 @@ except ImportError:
     logger.error("Not on the appropriate device")
 
 
-def list_of_measurements(request):
-    measurements = Measurement.objects.all().order_by("date")
-    return render(request, "measures.html", {"measures": measurements})
-
-
 @never_cache
+def list_of_measurements(request):
+    return render(request, "measures.html", {"rnd": random.random()})
+
+
 def get_data(request):
     measurements = Measurement.objects.filter(value__gt=10).order_by("date")
     datax = []
