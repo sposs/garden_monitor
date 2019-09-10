@@ -2,6 +2,9 @@
 import os
 import tempfile
 import matplotlib.pyplot as plt
+import matplotlib
+from matplotlib import dates
+from matplotlib.dates import DateFormatter
 
 from collect.models import Measurement, Sensor
 
@@ -19,13 +22,17 @@ def get_plot(rnd=0, sensor=None):
     tmp_dir = tempfile.mkdtemp()
     f_name = os.path.join(tmp_dir, "test%s.png" % rnd)
     for idx, measure in enumerate(measurements):
-        if idx % 20:
-            datax.append(measure.date.strftime("%s"))
-        else:
-            datax.append(None)
+        #if idx % 20:
+        datax.append(measure.date)
+        #else:
+        #    datax.append(None)
         datay.append(measure.value)
+    formatter = DateFormatter('%d/%m %H:%M')
+    dat = dates.date2num(datax)
     fig, ax = plt.subplots()
-    ax.plot(datax, datay)
+    ax.plot_date(dat, datay, "-")
+    ax.xaxis.set_major_formatter(formatter)
+    plt.gcf().autofmt_xdate()
 
     ax.set(xlabel='time (s)', ylabel=plot_y_label)
     fig.savefig(f_name)
