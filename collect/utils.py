@@ -2,30 +2,30 @@
 import os
 import tempfile
 import matplotlib.pyplot as plt
-import matplotlib
 from matplotlib import dates
 from matplotlib.dates import DateFormatter
 
-from collect.models import Measurement, Sensor
+from collect.models import Measurement
 
 
-def get_plot(rnd=0, sensor=None):
+def get_plot(rnd=0, sensor=None, from_date=None, to_date=None):
     measurements = Measurement.objects.filter(value__gt=10)
     plot_y_label = "Any"
     if sensor is not None:
         measurements = measurements.filter(sensor=sensor)
         if sensor.plot_y_axis_label:
             plot_y_label = sensor.plot_y_axis_label
+    if from_date:
+        measurements = measurements.filter(date__gte=from_date)
+    if to_date:
+        measurements = measurements.filter(date__lte=to_date)
     measurements = measurements.order_by("date")
     datax = []
     datay = []
     tmp_dir = tempfile.mkdtemp()
     f_name = os.path.join(tmp_dir, "test%s.png" % rnd)
     for idx, measure in enumerate(measurements):
-        #if idx % 20:
         datax.append(measure.date)
-        #else:
-        #    datax.append(None)
         datay.append(measure.value)
     formatter = DateFormatter('%d/%m %H:%M')
     dat = dates.date2num(datax)
