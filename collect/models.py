@@ -2,6 +2,22 @@
 from django.db import models
 
 
+class Relay(models.Model):
+
+    class State:
+        ON = "on"
+        OFF = "off"
+
+    name = models.CharField(max_length=50, unique=True)
+    rpi_port = models.IntegerField()
+    rpi_type = models.CharField(max_length=100, choices=(("analog", "Analog"), ("digital", "Digital")),
+                                default="digital")
+    state = models.CharField(max_length=4, choices=((State.ON, "On"), (State.OFF, "Off")), default="off")
+
+    def __unicode__(self):
+        return u"%s" % self.name
+
+
 class Sensor(models.Model):
     name = models.CharField(max_length=50, unique=True)
     rpi_port = models.IntegerField()

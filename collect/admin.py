@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-from collect.models import Measurement, Sensor
+from collect.models import Measurement, Sensor, Relay
 
 
 class MeasureAdmin(admin.ModelAdmin):
@@ -14,6 +14,11 @@ class SensorAdmin(admin.ModelAdmin):
     list_filter = ("rpi_type", )
 
 
+class RelayAdmin(admin.ModelAdmin):
+    list_display = ("name", "state", "rpi_type", "rpi_port")
+    list_filter = ("state", "rpi_type", )
+
+
 admin.site.register(Measurement, MeasureAdmin)
 admin.site.register(Sensor, SensorAdmin)
-
+admin.site.register(Relay, RelayAdmin)
