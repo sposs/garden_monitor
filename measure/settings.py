@@ -142,7 +142,7 @@ LOGGING = {
     },
     'handlers': {
         'mail_admins': {
-            'level': 'INFO',
+            'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler'
         },
         'console': {
@@ -162,7 +162,7 @@ LOGGING = {
             'propagate': True,
         },
         'garden_monitor': {
-            'handlers': ['console'],
+            'handlers': ['console', "mail_admins"],
             'level': 'INFO',
         },
         'celery.task': {

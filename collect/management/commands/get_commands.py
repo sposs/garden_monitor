@@ -5,13 +5,18 @@ import imaplib
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
+from collect.utils import parse_message
+import logging
+
+logger = logging.getLogger("garden_monitor.read_mails")
+
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
         conn = imaplib.IMAP4_SSL(host=settings.EMAIL_IMAP)
         conn.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
         conn.select()
-        typ, data = conn.search(None, "SUBJECT", 'Command')
+        typ, data = conn.search(None, "(NEW SUBJECT command)")
         if typ != "OK":
             conn.logout()
             raise CommandError("Cannot read emails")
@@ -26,7 +31,10 @@ class Command(BaseCommand):
                 parts = [parts]
             message = None
             for part in parts:
-                message = part.get_payload()
+                message = part.get_payload().strip()
                 break
-            print(message)
+            try:
+                parse_message(message)
+            except Exception as err:
+                logger.exception(err)
         conn.logout()

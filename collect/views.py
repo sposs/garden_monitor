@@ -14,7 +14,7 @@ try:
     from collect import grovepi
 except ImportError:
     grovepi = None
-    logger.error("Not on the appropriate device")
+    logger.warning("Not on the appropriate device")
 
 
 @never_cache

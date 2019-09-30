@@ -14,7 +14,7 @@ logger = logging.getLogger("garden_monitor.collect.measure")
 
 class Command(BaseCommand):
     def handle(self, *args, **kwargs):
-        sensors = Sensor.objects.all()
+        sensors = Sensor.objects.filter(state=Sensor.State.ON)
         for sensor in sensors:
             try:
                 if sensor.rpi_type == "analog":
@@ -27,4 +27,6 @@ class Command(BaseCommand):
             except Exception as err:
                 logger.exception(err)
                 return
+            if sensor.min_value is not None and val < sensor.min_value:
+                continue
             Measurement.objects.create(sensor=sensor, value=val)

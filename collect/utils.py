@@ -2,10 +2,14 @@
 import os
 import tempfile
 import matplotlib.pyplot as plt
+from django.core.management import call_command
 from matplotlib import dates
 from matplotlib.dates import DateFormatter
 
-from collect.models import Measurement
+from collect.models import Measurement, Sensor, Relay
+import re
+
+message_re = re.compile(r"^(sensor (?P<sensor_name>[0-9]+|[a-z ]+) (?P<sensor_status>on|off)|relay (?P<relay_name>[0-9]+|[a-z ]+) (?P<relay_status>on|off)|(?P<plot>get plots))", re.I)
 
 
 def get_plot(rnd=0, sensor=None, from_date=None, to_date=None):
@@ -37,3 +41,29 @@ def get_plot(rnd=0, sensor=None, from_date=None, to_date=None):
     ax.set(xlabel='time (s)', ylabel=plot_y_label)
     fig.savefig(f_name)
     return f_name
+
+
+def parse_message(message):
+    res = message_re.match(message)
+    if not res:
+        raise Exception("Invalid string")
+    if res.group("sensor_name"):
+        try:
+            sensor_name = int(res.group("sensor_name"))
+            sensor = Sensor.objects.get(id=sensor_name)
+        except ValueError:
+            sensor_name = res.group("sensor_name")
+            sensor = Sensor.objects.get(name__icontains=sensor_name)
+        sensor.state = sensor.State.state_for_value(res.group("sensor_status"))
+        sensor.save()
+    if res.group("relay_name"):
+        try:
+            relay_name = int(res.group("relay_name"))
+            relay = Relay.objects.get(id=relay_name)
+        except ValueError:
+            relay_name = res.group("relay_name")
+            relay = Relay.objects.get(name__icontains=relay_name)
+        relay.state = relay.State.state_for_value(res.group("relay_status"))
+        relay.save()
+    if res.group("plot"):
+        call_command("send_plot")
