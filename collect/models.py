@@ -42,7 +42,7 @@ class Sensor(models.Model):
     plot_y_axis_label = models.CharField(max_length=50, null=True, blank=True)
     state = models.CharField(max_length=4, choices=((State.ON, "On"), (State.OFF, "Off")), default="off")
 
-    max_value = models.IntegerField(null=True)
+    max_value = models.IntegerField(null=True, blank=True)
     min_value = models.IntegerField(default=0)
 
     def __unicode__(self):
