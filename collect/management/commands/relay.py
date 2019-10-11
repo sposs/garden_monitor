@@ -14,7 +14,8 @@ logger = logging.getLogger("garden_monitor.collect.relay")
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument()
+        parser.add_argument("--relay", dest="relay_name", required=False)
+        parser.add_argument("--state", dest="state", choices=[Relay.State.ON, Relay.State.OFF], required=False)
 
     def handle(self, *args, **options):
         if options.get("relay_name"):
