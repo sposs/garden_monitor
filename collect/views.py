@@ -6,15 +6,11 @@ from django.views.decorators.cache import never_cache
 from django.http import HttpResponse
 import logging
 
-from collect.models import Sensor, Relay
+from collect.models import Sensor
+from collect.probes import measure, relay
 from collect.utils import get_plot
 
 logger = logging.getLogger("garden_monitor.collect.views")
-try:
-    from collect import grovepi
-except ImportError:
-    grovepi = None
-    logger.warning("Not on the appropriate device")
 
 
 @never_cache
@@ -35,48 +31,11 @@ def get_data(request):
 
 
 def do_measure(request, sensor_id):
-
-    sensor = Sensor.objects.get(id=sensor_id)
-    try:
-        if sensor.rpi_type == "analog":
-            measure = grovepi.analogRead(sensor.rpi_port)
-        else:
-            measure = grovepi.digitalRead(sensor.rpi_port)
-    except IOError:
-        measure = "Error"
-    except Exception as err:
-        measure = "No grovepi"
-        logger.exception(err)
-    return HttpResponse(measure)
+    value = measure(sensor_id)
+    return HttpResponse(value)
 
 
-def relay(request, op, relay_id):
-    relaydb = Relay.objects.get(id=relay_id)
-    try:
-        if relaydb.rpi_type == "analog":
-            if op == "on":
-                if relaydb.state == relaydb.State.OFF:
-                    grovepi.analogWrite(relaydb.rpi_port, 1)
-                    relaydb.state = relaydb.State.ON
-            else:
-                if relaydb.state == relaydb.State.ON:
-                    grovepi.analogWrite(relaydb.rpi_port, 0)
-                    relaydb.state = relaydb.State.OFF
-        else:
-            if op == "on":
-                if relaydb.state == relaydb.State.OFF:
-                    grovepi.digitalWrite(relaydb.rpi_port, 1)
-                    relaydb.state = relaydb.State.ON
-            else:
-                if relaydb.state == relaydb.State.ON:
-                    grovepi.digitalWrite(relaydb.rpi_port, 0)
-                    relaydb.state = relaydb.State.OFF
-        error = False
-        relaydb.save()
-    except IOError:
-        error = True
-    except Exception as err:
-        error = "No grovepi"
-        logger.exception(err)
+def relay_req(request, op, relay_id):
+    error = relay(op, relay_id)
     return HttpResponse("has error: %s" % error)
 
