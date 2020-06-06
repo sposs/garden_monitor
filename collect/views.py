@@ -7,7 +7,7 @@ from django.http import HttpResponse
 import logging
 
 from collect.models import Sensor
-from collect.probes import measure, relay
+from collect.probes import measure, relay, read_encoder
 from collect.utils import get_plot
 
 logger = logging.getLogger("garden_monitor.collect.views")
@@ -32,6 +32,11 @@ def get_data(request):
 
 def do_measure(request, sensor_id):
     value = measure(sensor_id)
+    return HttpResponse(value)
+
+
+def encoder(request, encoder_id):
+    value = read_encoder(encoder_id)
     return HttpResponse(value)
 
 

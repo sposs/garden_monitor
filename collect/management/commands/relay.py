@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 from django.core.management.base import BaseCommand
-from collect.models import Measurement, Sensor, Relay
+from collect.models import Relay
 from collect.probes import relay, toggle_relay
+import logging
+logger = logging.getLogger("garden_monitor.collect.relay")
 
 try:
     from collect import grovepi
 except ImportError:
     grovepi = None
-import logging
-
-logger = logging.getLogger("garden_monitor.collect.relay")
+    logger.error("No grovepi found")
 
 
 class Command(BaseCommand):

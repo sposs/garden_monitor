@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_celery_beat',
     'collect'
 ]
 
@@ -169,3 +170,12 @@ LOGGING = {
         }
     }
 }
+CELERY_WORKER_HIJACK_ROOT_LOGGER = False
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+CELERY_RESULT_PERSISTENT = True
+CELERY_TASK_ACKS_LATE = True
+CELERY_BROKER_CONNECTION_TIMEOUT = 10
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+CELERY_WORKER_SEND_TASK_EVENTS = True
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 100
+CELERY_EVENT_QUEUE_EXPIRES = 60
