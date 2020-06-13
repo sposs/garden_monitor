@@ -21,10 +21,14 @@ def measure_async():
     sensors = Sensor.objects.filter(state=Sensor.State.ON)
     for sensor in sensors:
         val = measure(sensor.id)
-        if not isinstance(val, float):
+        try:
+            val = float(val)
+        except ValueError:
+            logger.error("Not a float %s", val)
             continue
         if sensor.min_value is not None and val < sensor.min_value:
             continue
+        logger.info("Saving measurement for sensor %s", sensor.name)
         Measurement.objects.create(sensor=sensor, value=val)
 
 
@@ -61,7 +65,7 @@ def get_commands_async():
 @shared_task(ignore_result=True)
 def send_plot_async():
     now = datetime.datetime.utcnow()
-    email = EmailMessage(
+    mail = EmailMessage(
         'Garden monitor report',
         'Data for %s' % now.strftime("%Y-%m-%d"),
         settings.EMAIL_HOST_USER,
@@ -74,11 +78,11 @@ def send_plot_async():
     for sensor in sensors:
         f_name = get_plot(sensor=sensor)
         with open(f_name, "rb") as data:
-            email.attach("plot_%s.png" % sensor.name, data.read(), "image/png")
+            mail.attach("plot_%s.png" % sensor.name, data.read(), "image/png")
         f_name = get_plot(sensor=sensor, from_date=yesterday)
         with open(f_name, "rb") as data:
-            email.attach("plot_%s_%s.png" % (sensor.name, yesterday.strftime("%Y%m%d%H%M")),
-                         data.read(), "image/png")
+            mail.attach("plot_%s_%s.png" % (sensor.name, yesterday.strftime("%Y%m%d%H%M")),
+                        data.read(), "image/png")
 
-    email.send()
+    mail.send()
 
