@@ -1,6 +1,7 @@
-django<2
+django
 numpy
-matplotlib<3
+matplotlib
 gunicorn
 celery
-django-celery-beat<2
+django_celery_beat
+redis
