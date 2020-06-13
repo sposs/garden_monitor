@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from django.db import models
-from django.utils import timezone
 
 
 class Relay(models.Model):
@@ -21,7 +20,7 @@ class Relay(models.Model):
                                 default="digital")
     state = models.CharField(max_length=4, choices=((State.ON, "On"), (State.OFF, "Off")), default="off")
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s" % self.name
 
 
@@ -48,7 +47,7 @@ class Sensor(models.Model):
 
     power_relay = models.ForeignKey(Relay, null=True, blank=True, on_delete=models.SET_NULL, related_name="probes")
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s" % self.name
 
 
@@ -64,7 +63,7 @@ class Encoder(models.Model):
     steps = models.IntegerField(default=32)
     refresh_interval = models.IntegerField(help_text="In seconds", default=5)
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s" % self.name
 
 
@@ -77,7 +76,7 @@ class EncoderMeasurement(models.Model):
         get_latest_by = "date"
         ordering = ("-date", )
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s - %s" % (self.sensor, self.value)
 
 
@@ -86,6 +85,6 @@ class EncoderLimit(models.Model):
     min_value = models.IntegerField()
     max_value = models.IntegerField()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.sensor.name
 
