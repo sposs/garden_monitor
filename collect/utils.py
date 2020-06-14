@@ -46,7 +46,7 @@ def get_plot(rnd=0, sensor=None, from_date=None, to_date=None):
         pname = pname.replace(" ", "_")
     p = PlotFile.objects.create(sensor=sensor)
     p.measurements.set(list(measurements))
-    with open(f_name) as data:
+    with open(f_name, "rb") as data:
         p.file.save("plot_%s_%s.png" % (pname, p.date.strftime("%Y%m%d%H%i")), File(data))
     return p
 
