@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-from collect.models import Measurement, Sensor, Relay, Encoder, EncoderMeasurement, EncoderLimit
+from collect.models import Measurement, Sensor, Relay, Encoder, EncoderMeasurement, EncoderLimit, PlotFile
 
 
 class MeasureAdmin(admin.ModelAdmin):
@@ -23,7 +23,6 @@ admin.site.register(Measurement, MeasureAdmin)
 admin.site.register(Sensor, SensorAdmin)
 admin.site.register(Relay, RelayAdmin)
 admin.site.register(Encoder)
-admin.site.register(EncoderMeasurement)
+admin.site.register(EncoderMeasurement, MeasureAdmin)
 admin.site.register(EncoderLimit)
-
-
+admin.site.register(PlotFile)

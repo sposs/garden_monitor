@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 import logging
 
-from collect.models import Sensor, Relay, Encoder
+from collect.models import Sensor, Relay
 
 logger = logging.getLogger("garden_monitor.collect.probes")
 try:
@@ -73,11 +73,15 @@ def toggle_relay(relay_id):
     return error
 
 
-def read_encoder(encoder_id):
-    encoder = Encoder.objects.get(id=encoder_id)
-    grovepi.encoder_en(pin=encoder.rpi_port, steps=encoder.steps)
-    encoder.last_value = grovepi.encoderRead(pin=encoder.rpi_port)
-    grovepi.encoder_dis(pin=encoder.rpi_port)
-    encoder.save()
-    return encoder.last_value
-
+# def read_encoder(encoder_id):
+#     """There is no use ding this: the encoder needs to be initialized then we read the diffs"""
+#     encoder = Encoder.objects.get(id=encoder_id)
+#     last_value = None
+#     try:
+#         grovepi.encoder_en(pin=encoder.rpi_port, steps=encoder.steps)
+#         last_value = grovepi.encoderRead(pin=encoder.rpi_port)
+#         grovepi.encoder_dis(pin=encoder.rpi_port)
+#     except Exception as err:
+#         logger.exception(err)
+#     return last_value
+#

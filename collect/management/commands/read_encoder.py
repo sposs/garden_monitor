@@ -19,7 +19,8 @@ class Command(BaseCommand):
         while True:
             try:
                 last_value = grovepi.encoderRead(pin=encoder.rpi_port)
-                if last_value != EncoderMeasurement.objects.all().latest().value:
+                if not EncoderMeasurement.objects.filter(sensor=encoder).exists() or \
+                        last_value != EncoderMeasurement.objects.filter(sensor=encoder).latest().value:
                     EncoderMeasurement.objects.create(value=last_value, sensor=encoder)
                 time.sleep(encoder.refresh_interval)
             except KeyboardInterrupt:

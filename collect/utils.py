@@ -2,11 +2,12 @@
 import os
 import tempfile
 import matplotlib.pyplot as plt
+from django.core.files import File
 from django.core.management import call_command
 from matplotlib import dates
 from matplotlib.dates import DateFormatter
 
-from collect.models import Measurement, Sensor, Relay
+from collect.models import Measurement, Sensor, Relay, PlotFile
 import re
 
 message_re = re.compile(r"^(sensor (?P<sensor_name>[0-9]+|[a-z ]+) (?P<sensor_status>on|off)|relay (?P<relay_name>[0-9]+|[a-z ]+) (?P<relay_status>on|off)|(?P<plot>get plots))", re.I)
@@ -40,7 +41,14 @@ def get_plot(rnd=0, sensor=None, from_date=None, to_date=None):
 
     ax.set(xlabel='time (s)', ylabel=plot_y_label)
     fig.savefig(f_name)
-    return f_name
+    pname = sensor.name
+    while " " in pname:
+        pname = pname.replace(" ", "_")
+    p = PlotFile.objects.create(sensor=sensor)
+    p.measurements.set(list(measurements))
+    with open(f_name) as data:
+        p.file.save("plot_%s_%s.png" % (pname, p.date.strftime("%Y%m%d%H%i")), File(data))
+    return p
 
 
 def parse_message(message):

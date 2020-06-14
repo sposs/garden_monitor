@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Email</title>
+</head>
+<body>
+<table style="text-align: center">
+    <tbody>
+    {% for sensor, plots in data.items %}
+        <tr><td><h1>{{ sensor.name }}</h1></td></tr>
+        {% for plot in plots %}
+        <tr>
+        <td><img src="{{ plot.file.url }}" alt="{{ plot.sensor.name }}"/></td>
+        </tr>
+        {% endfor %}
+    {% endfor%}
+    </tbody>
+</table>
+</body>
+</html>

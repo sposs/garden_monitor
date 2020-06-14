@@ -6,10 +6,11 @@ from django.conf import settings
 from celery import shared_task
 
 from celery.utils.log import get_task_logger
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMultiAlternatives
+from django.template import loader
 from django.utils import timezone
 
-from collect.models import Sensor, Measurement
+from collect.models import Sensor, Measurement, PlotFile
 from collect.probes import measure
 from collect.utils import parse_message, get_plot
 
@@ -64,25 +65,33 @@ def get_commands_async():
 
 @shared_task(ignore_result=True)
 def send_plot_async():
-    now = datetime.datetime.utcnow()
-    mail = EmailMessage(
-        'Garden monitor report',
+    t = loader.get_template("plot_email.html")
+    now = timezone.now()
+    yesterday = now - datetime.timedelta(days=1)
+    sensors = Sensor.objects.all()
+    mail = EmailMultiAlternatives(
+        'Garden monitor report %s' % now.strftime("%Y-%m-%d"),
         'Data for %s' % now.strftime("%Y-%m-%d"),
         settings.EMAIL_HOST_USER,
         [settings.EMAIL_RECIPIENT],
-        None
     )
-    now = datetime.datetime.utcnow().replace(tzinfo=timezone.utc)
-    yesterday = now - datetime.timedelta(days=1)
-    sensors = Sensor.objects.all()
+    c = {"data": {}}
     for sensor in sensors:
-        f_name = get_plot(sensor=sensor)
-        with open(f_name, "rb") as data:
-            mail.attach("plot_%s.png" % sensor.name, data.read(), "image/png")
-        f_name = get_plot(sensor=sensor, from_date=yesterday)
-        with open(f_name, "rb") as data:
-            mail.attach("plot_%s_%s.png" % (sensor.name, yesterday.strftime("%Y%m%d%H%M")),
-                        data.read(), "image/png")
-
+        p1 = get_plot(sensor=sensor)
+        p2 = get_plot(sensor=sensor, from_date=yesterday)
+        c["data"][sensor] = [p1, p2]
+        mail.attach(p1.file.name, p1.file.read(), "image/png")
+        mail.attach(p2.file.name, p2.file.read(), "image/png")
+    message = t.render(c)
+    mail.attach_alternative(message, "text/html")
     mail.send()
 
+
+@shared_task(ignore_result=True)
+def clean_old_plots():
+    old_times = timezone.now() - datetime.timedelta(days=10)
+    old = PlotFile.objects.filter(date__lt=old_times)
+    logger.info("Removing %s old plots", old.count())
+    for o in old:
+        o.file.delete()
+        o.delete()

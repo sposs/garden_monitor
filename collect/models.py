@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
+from django.utils import timezone
 
 
 class Relay(models.Model):
@@ -7,6 +8,7 @@ class Relay(models.Model):
     class State:
         ON = "on"
         OFF = "off"
+
         @classmethod
         def state_for_value(cls, val):
             if val.lower() == 'on':
@@ -28,6 +30,7 @@ class Sensor(models.Model):
     class State:
         ON = "on"
         OFF = "off"
+
         @classmethod
         def state_for_value(cls, val):
             if val.lower() == 'on':
@@ -55,6 +58,16 @@ class Measurement(models.Model):
     sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, null=True, related_name="measures")
     date = models.DateTimeField(auto_now_add=True)
     value = models.IntegerField(null=True)
+
+
+class PlotFile(models.Model):
+    sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, null=False, related_name="plots")
+    measurements = models.ManyToManyField(Measurement, blank=True, related_name="plots")
+    date = models.DateTimeField(default=timezone.now)
+    file = models.FileField(upload_to="plots")
+
+    def __str__(self):
+        return self.date.strftime("%Y-%m-%d %H:%i")
 
 
 class Encoder(models.Model):
@@ -87,4 +100,3 @@ class EncoderLimit(models.Model):
 
     def __str__(self):
         return self.sensor.name
-

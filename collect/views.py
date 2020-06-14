@@ -6,8 +6,8 @@ from django.views.decorators.cache import never_cache
 from django.http import HttpResponse
 import logging
 
-from collect.models import Sensor
-from collect.probes import measure, relay, read_encoder
+from collect.models import Sensor, EncoderMeasurement
+from collect.probes import measure, relay
 from collect.utils import get_plot
 
 logger = logging.getLogger("garden_monitor.collect.views")
@@ -36,11 +36,14 @@ def do_measure(request, sensor_id):
 
 
 def encoder(request, encoder_id):
-    value = read_encoder(encoder_id)
+    measures = EncoderMeasurement.objects.filter(sensor_id=encoder_id)
+    if measures.exists():
+        value = measures.latest().value
+    else:
+        value = "Nothing yet"
     return HttpResponse(value)
 
 
 def relay_req(request, op, relay_id):
     error = relay(op, relay_id)
     return HttpResponse("has error: %s" % error)
-
