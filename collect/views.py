@@ -24,10 +24,9 @@ def get_data(request):
     sensor = None
     if request.GET.get("sensor_id") is not None:
         sensor = Sensor.objects.get(id=request.GET["sensor_id"])
-    f_name = get_plot(request.GET.get("rnd", 0), sensor)
-    with open(f_name, "rb") as data:
-        res = HttpResponse(data.read(), content_type="image/png")
-        return res
+    p = get_plot(request.GET.get("rnd", 0), sensor)
+    res = HttpResponse(p.file.read(), content_type="image/png")
+    return res
 
 
 def do_measure(request, sensor_id):
